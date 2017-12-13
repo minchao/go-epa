@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -120,13 +121,27 @@ func sanitizeURL(uri *url.URL) *url.URL {
 	return uri
 }
 
+// ErrorResponse reports error caused by an API request.
+type ErrorResponse struct {
+	Response *http.Response
+	Message  string `json:"Message"`
+}
+
+func (e *ErrorResponse) Error() string {
+	return e.Message
+}
+
 // CheckResponse checks the API response for errors.
 func CheckResponse(r *http.Response) error {
 	if c := r.StatusCode; 200 <= c && c <= 299 {
 		return nil
 	}
 
-	// TODO
+	errorResponse := &ErrorResponse{Response: r}
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil && data != nil {
+		json.Unmarshal(data, errorResponse)
+	}
 
-	return nil
+	return errorResponse
 }
