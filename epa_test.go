@@ -69,11 +69,11 @@ func areEqualJSON(j1, j2 []byte) (bool, error) {
 	var err error
 	err = json.Unmarshal(j1, &v1)
 	if err != nil {
-		return false, fmt.Errorf("Unmarshal JSON 1 error: %v", err)
+		return false, fmt.Errorf("unmarshal JSON 1 error: %v", err)
 	}
 	err = json.Unmarshal(j2, &v2)
 	if err != nil {
-		return false, fmt.Errorf("Unmarshal JSON 2 error: %v", err)
+		return false, fmt.Errorf("unmarshal JSON 2 error: %v", err)
 	}
 
 	return reflect.DeepEqual(v1, v2), nil
