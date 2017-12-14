@@ -1,6 +1,7 @@
 package epa
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -76,6 +77,23 @@ func areEqualJSON(j1, j2 []byte) (bool, error) {
 	}
 
 	return reflect.DeepEqual(v1, v2), nil
+}
+
+// Test that an error caused by the internal http client's Do() function does not leak the client token.
+func TestDo_sanitizeURL(t *testing.T) {
+	client := NewClient("token", nil)
+	client.BaseURL = &url.URL{Scheme: "http", Host: "127.0.0.1:0", Path: "/"} // Use port 0 on purpose to trigger a dial TCP error, expect to get "dial tcp 127.0.0.1:0: connect: can't assign requested address".
+	req, err := client.NewRequest("GET", ".", nil)
+	if err != nil {
+		t.Fatalf("NewRequest returned unexpected error: %v", err)
+	}
+	_, err = client.Do(context.Background(), req, nil)
+	if err == nil {
+		t.Fatal("Expected error to be returned.")
+	}
+	if strings.Contains(err.Error(), "PWD=password") {
+		t.Errorf("Do error contains token, should be redacted:\n%q", err)
+	}
 }
 
 func TestCheckResponse(t *testing.T) {
