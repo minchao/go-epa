@@ -139,7 +139,7 @@ func CheckResponse(r *http.Response) error {
 
 	errorResponse := &ErrorResponse{Response: r}
 	data, err := ioutil.ReadAll(r.Body)
-	if err != nil && data != nil {
+	if err == nil && data != nil {
 		json.Unmarshal(data, errorResponse)
 	}
 

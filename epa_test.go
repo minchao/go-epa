@@ -3,10 +3,12 @@ package epa
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -74,4 +76,25 @@ func areEqualJSON(j1, j2 []byte) (bool, error) {
 	}
 
 	return reflect.DeepEqual(v1, v2), nil
+}
+
+func TestCheckResponse(t *testing.T) {
+	res := &http.Response{
+		Request:    &http.Request{},
+		StatusCode: http.StatusInternalServerError,
+		Body:       ioutil.NopCloser(strings.NewReader(`{"Message": "An error has occurred."}`)),
+	}
+
+	err := CheckResponse(res).(*ErrorResponse)
+	if err == nil {
+		t.Errorf("Expected error response.")
+	}
+
+	want := &ErrorResponse{
+		Response: res,
+		Message:  "An error has occurred.",
+	}
+	if !reflect.DeepEqual(err, want) {
+		t.Errorf("Error = %#v, want %#v", err, want)
+	}
 }
