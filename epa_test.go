@@ -123,7 +123,7 @@ func TestClient_NewRequest_badURL(t *testing.T) {
 }
 
 // ensure that no User-Agent header is set if the client's UserAgent is empty.
-func TestNewRequest_emptyUserAgent(t *testing.T) {
+func TestClient_NewRequest_emptyUserAgent(t *testing.T) {
 	c := NewClient("", nil)
 	c.UserAgent = ""
 	req, err := c.NewRequest(http.MethodGet, ".", nil)
@@ -141,7 +141,7 @@ func TestNewRequest_emptyUserAgent(t *testing.T) {
 // body that is an empty string versus one that is not set at all. However in
 // certain cases, intermediate systems may treat these differently resulting in
 // subtle errors.
-func TestNewRequest_emptyBody(t *testing.T) {
+func TestClient_NewRequest_emptyBody(t *testing.T) {
 	c := NewClient("", nil)
 	req, err := c.NewRequest(http.MethodGet, ".", nil)
 	if err != nil {
@@ -152,7 +152,7 @@ func TestNewRequest_emptyBody(t *testing.T) {
 	}
 }
 
-func TestNewRequest_errorForNoTrailingSlash(t *testing.T) {
+func TestClient_NewRequest_errorForNoTrailingSlash(t *testing.T) {
 	tests := []struct {
 		rawurl    string
 		wantError bool
