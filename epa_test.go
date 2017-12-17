@@ -135,7 +135,7 @@ func TestClient_NewRequest_emptyUserAgent(t *testing.T) {
 	}
 }
 
-// If a nil body is passed to github.NewRequest, make sure that nil is also
+// If a nil body is passed to epa.NewRequest, make sure that nil is also
 // passed to http.NewRequest. In most cases, passing an io.Reader that returns
 // no content is fine, since there is no difference between an HTTP request
 // body that is an empty string versus one that is not set at all. However in
@@ -217,7 +217,6 @@ func TestClient_Do_httpError(t *testing.T) {
 	if resp.StatusCode != 400 {
 		t.Errorf("Expected HTTP 400 error, got %d status code.", resp.StatusCode)
 	}
-
 }
 
 func TestClient_Do_noContent(t *testing.T) {
