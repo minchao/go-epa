@@ -97,7 +97,7 @@ func TestClient_NewRequest(t *testing.T) {
 
 	inURL, outURL := "/foo", defaultBaseURL+"foo"
 	inBody, outBody := "Hello, 世界", "Hello, 世界"
-	req, _ := c.NewRequest("GET", inURL, strings.NewReader(inBody))
+	req, _ := c.NewRequest(http.MethodGet, inURL, strings.NewReader(inBody))
 
 	// test that relative URL was expanded
 	if got, want := req.URL.String(), outURL; got != want {
@@ -118,7 +118,7 @@ func TestClient_NewRequest(t *testing.T) {
 
 func TestClient_NewRequest_badURL(t *testing.T) {
 	c := NewClient("token", nil)
-	_, err := c.NewRequest("GET", ":", nil)
+	_, err := c.NewRequest(http.MethodGet, ":", nil)
 	testURLParseError(t, err)
 }
 
@@ -126,7 +126,7 @@ func TestClient_NewRequest_badURL(t *testing.T) {
 func TestNewRequest_emptyUserAgent(t *testing.T) {
 	c := NewClient("", nil)
 	c.UserAgent = ""
-	req, err := c.NewRequest("GET", ".", nil)
+	req, err := c.NewRequest(http.MethodGet, ".", nil)
 	if err != nil {
 		t.Fatalf("NewRequest returned unexpected error: %v", err)
 	}
@@ -143,7 +143,7 @@ func TestNewRequest_emptyUserAgent(t *testing.T) {
 // subtle errors.
 func TestNewRequest_emptyBody(t *testing.T) {
 	c := NewClient("", nil)
-	req, err := c.NewRequest("GET", ".", nil)
+	req, err := c.NewRequest(http.MethodGet, ".", nil)
 	if err != nil {
 		t.Fatalf("NewRequest returned unexpected error: %v", err)
 	}
@@ -161,13 +161,13 @@ func TestClient_Do(t *testing.T) {
 	}
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if m := "GET"; m != r.Method {
+		if m := http.MethodGet; m != r.Method {
 			t.Errorf("Request method = %v, want %v", r.Method, m)
 		}
 		fmt.Fprint(w, `{"A":"a"}`)
 	})
 
-	req, _ := client.NewRequest("GET", ".", nil)
+	req, _ := client.NewRequest(http.MethodGet, ".", nil)
 	body := new(foo)
 	client.Do(context.Background(), req, body)
 
@@ -185,7 +185,7 @@ func TestClient_Do_httpError(t *testing.T) {
 		http.Error(w, "Bad Request", 400)
 	})
 
-	req, _ := client.NewRequest("GET", ".", nil)
+	req, _ := client.NewRequest(http.MethodGet, ".", nil)
 	resp, err := client.Do(context.Background(), req, nil)
 
 	if err == nil {
@@ -207,7 +207,7 @@ func TestClient_Do_noContent(t *testing.T) {
 
 	var body json.RawMessage
 
-	req, _ := client.NewRequest("GET", ".", nil)
+	req, _ := client.NewRequest(http.MethodGet, ".", nil)
 	_, err := client.Do(context.Background(), req, &body)
 	if err != nil {
 		t.Fatalf("Do returned unexpected error: %v", err)
@@ -218,7 +218,7 @@ func TestClient_Do_noContent(t *testing.T) {
 func TestClient_Do_sanitizeURL(t *testing.T) {
 	client := NewClient("token", nil)
 	client.BaseURL = &url.URL{Scheme: "http", Host: "127.0.0.1:0", Path: "/"} // Use port 0 on purpose to trigger a dial TCP error, expect to get "dial tcp 127.0.0.1:0: connect: can't assign requested address".
-	req, err := client.NewRequest("GET", ".", nil)
+	req, err := client.NewRequest(http.MethodGet, ".", nil)
 	if err != nil {
 		t.Fatalf("NewRequest returned unexpected error: %v", err)
 	}

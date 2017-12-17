@@ -41,7 +41,7 @@ func (c *Client) GetAirQualityForecast(ctx context.Context, options url.Values) 
 	u.RawQuery = options.Encode()
 
 	forecast := new(AirQualityForecastResponse)
-	req, err := c.NewRequest("GET", u.String(), nil)
+	req, err := c.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
 		return nil, nil, err
 	}
