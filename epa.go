@@ -22,9 +22,7 @@ type Client struct {
 	client *http.Client
 	token  string
 
-	// Base URL for API requests. Defaults to the public GitHub API, but can be
-	// set to a domain endpoint to use with GitHub Enterprise. BaseURL should
-	// always be specified with a trailing slash.
+	// Base URL for API requests, should always be specified with a trailing slash.
 	BaseURL *url.URL
 
 	// User agent used when communicating with the EPA API.
