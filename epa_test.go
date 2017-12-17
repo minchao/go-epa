@@ -13,32 +13,25 @@ import (
 	"testing"
 )
 
-var (
+// setup sets up a test HTTP server along with a epa.Client that is
+// configured to talk to that test server. Tests should register handlers on
+// mux which provide mock responses for the API method being tested.
+func setup() (client *Client, mux *http.ServeMux, serverURL string, teardown func()) {
 	// mux is the HTTP request multiplexer used with the test server.
-	mux *http.ServeMux
+	mux = http.NewServeMux()
 
-	// client is the Apple Music client being tested.
-	client *Client
+	apiHandler := http.NewServeMux()
+	apiHandler.Handle("/", mux)
 
 	// server is a test HTTP server used to provide mock API responses.
-	server *httptest.Server
-)
+	server := httptest.NewServer(apiHandler)
 
-// setup sets up a test HTTP server along with a every9d.Client that is configured to talk to that test server.
-func setup() {
-	// test server
-	mux = http.NewServeMux()
-	server = httptest.NewServer(mux)
-
-	// EVERY8D client configured to use test server
+	// EPA client configured to use test server
 	client = NewClient("token", nil)
 	u, _ := url.Parse(server.URL)
 	client.BaseURL = u
-}
 
-// teardown closes the test HTTP server.
-func teardown() {
-	server.Close()
+	return client, mux, server.URL, server.Close
 }
 
 func testMethod(t *testing.T, r *http.Request, want string) {
@@ -160,7 +153,7 @@ func TestNewRequest_emptyBody(t *testing.T) {
 }
 
 func TestClient_Do(t *testing.T) {
-	setup()
+	client, mux, _, teardown := setup()
 	defer teardown()
 
 	type foo struct {
@@ -185,7 +178,7 @@ func TestClient_Do(t *testing.T) {
 }
 
 func TestClient_Do_httpError(t *testing.T) {
-	setup()
+	client, mux, _, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -205,7 +198,7 @@ func TestClient_Do_httpError(t *testing.T) {
 }
 
 func TestClient_Do_noContent(t *testing.T) {
-	setup()
+	client, mux, _, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

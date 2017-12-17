@@ -11,7 +11,7 @@ import (
 )
 
 func TestClient_GetAirQualityForecast(t *testing.T) {
-	setup()
+	client, mux, _, teardown := setup()
 	defer teardown()
 
 	testdata, _ := ioutil.ReadFile(fmt.Sprintf("./testdata/%v.json", ResourceIDAirQualityForecast))
