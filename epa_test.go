@@ -28,7 +28,7 @@ func setup() (client *Client, mux *http.ServeMux, serverURL string, teardown fun
 
 	// EPA client configured to use test server
 	client = NewClient("token", nil)
-	u, _ := url.Parse(server.URL)
+	u, _ := url.Parse(server.URL + "/")
 	client.BaseURL = u
 
 	return client, mux, server.URL, server.Close
@@ -149,6 +149,29 @@ func TestNewRequest_emptyBody(t *testing.T) {
 	}
 	if req.Body != nil {
 		t.Fatalf("constructed request contains a non-nil Body")
+	}
+}
+
+func TestNewRequest_errorForNoTrailingSlash(t *testing.T) {
+	tests := []struct {
+		rawurl    string
+		wantError bool
+	}{
+		{rawurl: "https://example.com/api", wantError: true},
+		{rawurl: "https://example.com/api/", wantError: false},
+	}
+	c := NewClient("", nil)
+	for _, test := range tests {
+		u, err := url.Parse(test.rawurl)
+		if err != nil {
+			t.Fatalf("url.Parse returned unexpected error: %v.", err)
+		}
+		c.BaseURL = u
+		if _, err := c.NewRequest(http.MethodGet, "test", nil); test.wantError && err == nil {
+			t.Fatalf("Expected error to be returned.")
+		} else if !test.wantError && err != nil {
+			t.Fatalf("NewRequest returned unexpected error: %v.", err)
+		}
 	}
 }
 

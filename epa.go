@@ -3,10 +3,12 @@ package epa
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 const (
@@ -47,6 +49,9 @@ func NewClient(token string, httpClient *http.Client) *Client {
 
 // NewRequest creates an API request.
 func (c *Client) NewRequest(method, urlStr string, body io.Reader) (*http.Request, error) {
+	if !strings.HasSuffix(c.BaseURL.Path, "/") {
+		return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.BaseURL)
+	}
 	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
