@@ -3,7 +3,9 @@
 [![Build Status](https://travis-ci.org/minchao/go-epa.svg?branch=master)](https://travis-ci.org/minchao/go-epa)
 [![codecov](https://codecov.io/gh/minchao/go-epa/branch/master/graph/badge.svg)](https://codecov.io/gh/minchao/go-epa)
 
-台灣環保署開放資料 Golang library
+台灣環保署開放資料 Golang library，詳細的 API 文件請參考[環境資源資料開放平臺][1]
+
+本專案架構自 [go-github][2] 獲益良多，特此感謝
 
 ## 安裝
 
@@ -34,3 +36,6 @@ credit, err := client.GetAirQualityForecast(ctx, options)
 ## License
 
 This library is distributed under the BSD-style license found in the [LICENSE](./LICENSE) file.
+
+[1]: https://opendata.epa.gov.tw/
+[2]: https://github.com/google/go-github
