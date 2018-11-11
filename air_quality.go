@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	ResourceIDAirQualityForecast = "355000000I-000022"
+	ResourceIDAirQualityForecast = "355000000I-000001"
 )
 
 type AirQualityForecastResponse struct {
