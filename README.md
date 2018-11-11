@@ -30,7 +30,7 @@ ctx := context.Background()
 // 取得空氣品質預測資料
 options := url.Values{}
 options.Set("sort", "PublishTime")
-credit, err := client.GetAirQualityForecast(ctx, options)
+resp, _, err := client.GetAirQualityForecast(ctx, options)
 ```
 
 ## License
